@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 @Module({
   imports: [
     MongooseModule.forRoot(
-      `mongodb+srv://admin:<password>@cluster0.q1gam.mongodb.net/?retryWrites=true&w=majority`,
+      `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.q1gam.mongodb.net/cafetoria?retryWrites=true&w=majority`
     ),
   ],
   controllers: [AppController],
