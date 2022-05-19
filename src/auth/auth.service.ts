@@ -7,7 +7,7 @@ import { JwtPayload } from './auth.interface';
 export class AuthService {
   constructor(private jwtService: JwtService) {}
   signJwt(user: User): string {
-    return this.jwtService.sign({ name: user, roles: user.roles });
+    return this.jwtService.sign({ name: user.name, roles: user.roles });
   }
   verifyJwt(token: string) {
     return this.jwtService.verify(token);

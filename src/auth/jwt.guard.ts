@@ -1,6 +1,5 @@
 import { ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { resolveSoa } from 'dns';
 import { JwtPayload } from './auth.interface';
 import { Role } from './jwt.constant';
 

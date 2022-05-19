@@ -16,7 +16,7 @@ export class User {
   @Prop({ required: true })
   email: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }], required: true })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }], required: false })
   posts: Post[];
 
   @Prop({ required: true })
