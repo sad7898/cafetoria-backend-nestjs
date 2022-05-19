@@ -1,25 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserGuard } from 'src/auth/jwt.guard';
+import { AuthService } from 'src/auth/auth.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Role } from 'src/auth/jwt.constant';
 
+@ApiTags('user')
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly authService: AuthService) {}
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
   @Get()
   findAll() {
     return this.userService.findAll();
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Get('jwt')
+  findOne() {
+    return this.authService.signJwt({ name: 'hewwo', roles: [Role.user], password: 'heewwo', email: 'asdasas', posts: [] });
   }
 
   @Patch(':id')
