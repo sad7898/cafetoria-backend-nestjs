@@ -26,6 +26,10 @@ export class PostController {
   async seed() {
     return await this.postService.seed();
   }
+  @Get(':id')
+  async getById(@Param('id') id: string) {
+    return await this.postService.findById(id);
+  }
   @Patch(':id')
   @ApiBearerAuth()
   @UseGuards(UserGuard)
