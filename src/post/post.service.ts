@@ -28,8 +28,8 @@ export class PostService {
     query.skip(page * 10).limit(10);
     return await query;
   }
-  async findById(id: number) {
-    const post = await this.postModel.findById(id).populate({ path: 'author' });
+  async findById(id: string) {
+    const post = await this.postModel.findById(id).populate('author', { password: 0 });
     return post;
   }
   async seed() {
