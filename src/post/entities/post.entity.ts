@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { User } from 'src/user/entities/user.entity';
+import { User, UserDocument } from 'src/user/entities/user.entity';
 
 export type PostDocument = Post & Document;
 
@@ -13,7 +13,7 @@ export class Post {
   text: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-  author: User;
+  author: UserDocument;
 
   @Prop({ required: true, default: new Date() })
   created: Date;

@@ -36,7 +36,7 @@ export class UserService {
     return user;
   }
   async findById(id: string) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id, { password: 0 });
     return user;
   }
   async update(dto: UpdateUserDto, id: string) {
@@ -47,7 +47,7 @@ export class UserService {
       if (existingUser.email === dto.email) throw new BadRequestException('This email is already taken');
       else throw new BadRequestException('This username is already taken');
     }
-    const updatedUser = await user.overwrite({ ...dto, name: dto.username, password: user.password });
+    const updatedUser = await user.overwrite({ ...dto, name: dto.username, password: user.password, posts: user.posts });
     return updatedUser;
   }
 }
