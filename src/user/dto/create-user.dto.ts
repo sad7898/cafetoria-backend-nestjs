@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, MinLength, MaxLength, Validate, IsEmail } from 'class-validator';
 import { IsValidCharacter } from '../user.validator';
+import { Profile } from './get-user.dto';
 
 export class CreateUserDto {
   @ApiProperty()
@@ -28,4 +29,14 @@ export class SignInDto {
   @IsString()
   @Validate(IsValidCharacter, { message: 'Password must not contain invalid characters' })
   password: string;
+}
+export class SignInResponse {
+  @ApiProperty({ type: Profile })
+  user: Profile;
+  @ApiProperty({ type: String })
+  token: string;
+}
+export class SignUpResponse {
+  @ApiProperty({ type: Boolean })
+  success: boolean
 }

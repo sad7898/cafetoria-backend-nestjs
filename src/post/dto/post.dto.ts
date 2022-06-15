@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { IsArray, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Post } from '../entities/post.entity';
 import { Filter } from '../post.interface';
@@ -38,3 +38,5 @@ export class PostQuery {
   @IsNumber()
   page: number;
 }
+
+export class PostResponse extends Post {}

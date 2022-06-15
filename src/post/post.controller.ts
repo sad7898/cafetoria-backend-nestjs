@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UsePipes, ValidationPipe } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, PostFilterDto, PostQuery, UpdatePostDto } from './dto/post.dto';
-import { ApiBearerAuth, ApiBody, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { CreatePostDto, PostFilterDto, PostQuery, PostResponse, UpdatePostDto } from './dto/post.dto';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserGuard } from 'src/auth/jwt.guard';
 @ApiTags('post')
 @Controller('post')
@@ -10,15 +10,18 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
   @Post(':page')
   @ApiBody({ type: PostFilterDto })
-  async getAll(@Param('page') page: number, @Body() body: PostFilterDto) {
+  @ApiResponse({ type: [PostResponse] })
+  async getAll(@Param('page') page: number, @Body() body: PostFilterDto): Promise<PostResponse[]> {
     const posts = await this.postService.findAll(body, page);
     return posts;
   }
+
   @ApiBearerAuth()
   @UseGuards(UserGuard)
   @ApiBody({ type: CreatePostDto })
+  @ApiResponse({ type: PostResponse })
   @Post()
-  async create(@Body() createPostDto: CreatePostDto, @Req() req) {
+  async create(@Body() createPostDto: CreatePostDto, @Req() req): Promise<PostResponse> {
     return await this.postService.create(createPostDto, req.user.id);
   }
   //TODO: remove before prod
@@ -27,7 +30,7 @@ export class PostController {
     return await this.postService.seed();
   }
   @Get(':id')
-  async getById(@Param('id') id: string) {
+  async getById(@Param('id') id: string): Promise<PostResponse> {
     return await this.postService.findById(id);
   }
   @Patch(':id')
