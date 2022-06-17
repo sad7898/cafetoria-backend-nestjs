@@ -32,26 +32,26 @@ export class PostService {
     const post = await this.postModel.findById(id).populate('author', { password: 0 });
     return post;
   }
-  async seed() {
-    const author = await this.userService.findById('6287658491a854c35dcdc069');
-    const tags = ['Meat', 'Veggie', 'Fats', 'Carbohydrates'];
-    const randomTags = () =>
-      tags.filter(() => {
-        const i = Math.round(Math.random());
-        return !!i;
-      });
-    const posts = [];
-    for (let i = 0; i < 100; i++) {
-      posts.push({
-        author,
-        topic: faker.commerce.productName(),
-        tags: randomTags(),
-        text: 'this is just a recipe',
-        created: new Date(),
-      });
-    }
-    return await this.postModel.insertMany(posts);
-  }
+  // async seed() {
+  //   const author = await this.userService.findById('6287658491a854c35dcdc069');
+  //   const tags = ['Meat', 'Veggie', 'Fats', 'Carbohydrates'];
+  //   const randomTags = () =>
+  //     tags.filter(() => {
+  //       const i = Math.round(Math.random());
+  //       return !!i;
+  //     });
+  //   const posts = [];
+  //   for (let i = 0; i < 100; i++) {
+  //     posts.push({
+  //       author,
+  //       topic: faker.commerce.productName(),
+  //       tags: randomTags(),
+  //       text: 'this is just a recipe',
+  //       created: new Date(),
+  //     });
+  //   }
+  //   return await this.postModel.insertMany(posts);
+  // }
 
   async update(id: string, authorId: string, updatePostDto: UpdatePostDto) {
     const post = await this.postModel.findById(id).populate('author');

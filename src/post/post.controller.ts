@@ -25,10 +25,10 @@ export class PostController {
     return await this.postService.create(createPostDto, req.user.id);
   }
   //TODO: remove before prod
-  @Get('seed')
-  async seed() {
-    return await this.postService.seed();
-  }
+  // @Get('seed')
+  // async seed() {
+  //   return await this.postService.seed();
+  // }
   @Get(':id')
   async getById(@Param('id') id: string): Promise<PostResponse> {
     return await this.postService.findById(id);
