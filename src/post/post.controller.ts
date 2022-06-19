@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Query, UsePipes, ValidationPipe, HttpCode } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto, PostFilterDto, PostQuery, PostResponse, UpdatePostDto } from './dto/post.dto';
+import { BulkPostResponse, CreatePostDto, PostFilterDto, PostQuery, PostResponse, UpdatePostDto } from './dto/post.dto';
 import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserGuard } from 'src/auth/jwt.guard';
 @ApiTags('post')
@@ -10,8 +10,9 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
   @Post(':page')
   @ApiBody({ type: PostFilterDto })
-  @ApiResponse({ type: [PostResponse] })
-  async getAll(@Param('page') page: number, @Body() body: PostFilterDto): Promise<PostResponse[]> {
+  @HttpCode(200)
+  @ApiResponse({ type: BulkPostResponse })
+  async getAll(@Param('page') page: number, @Body() body: PostFilterDto): Promise<BulkPostResponse> {
     const posts = await this.postService.findAll(body, page);
     return posts;
   }

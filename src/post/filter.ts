@@ -27,7 +27,9 @@ export class FilterBuilder<T> {
   }
   addMatchField(key: keyof T, match?: any) {
     if (match) {
-      this.filter.$and.push({ key: match });
+      const ob: FilterQuery<T> = {}
+      ob[key] = match
+      this.filter.$and.push(ob);
     }
     return this;
   }

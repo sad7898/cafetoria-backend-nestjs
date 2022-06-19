@@ -2,12 +2,13 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { FilterQuery, Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
-import { CreatePostDto, PostFilterDto, PostQuery, UpdatePostDto } from './dto/post.dto';
+import { BulkPostResponse, CreatePostDto, PostFilterDto, PostQuery, PostResponse, UpdatePostDto } from './dto/post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { FilterBuilder } from './filter';
 import { Filter } from './post.interface';
 import { faker } from '@faker-js/faker';
 import { NotFoundError } from 'rxjs';
+import { pipeline } from 'stream';
 
 @Injectable()
 export class PostService {
@@ -18,15 +19,32 @@ export class PostService {
     return await this.postModel.create({ ...createPostDto, author });
   }
 
-  async findAll({ tags, topic, sortKey }: PostFilterDto, page: number) {
+  async findAll({ tags, topic, sortKey }: PostFilterDto, page: number): Promise<BulkPostResponse> {
     if (sortKey && !['created', 'topic'].includes(sortKey)) throw new BadRequestException('Invalid sort key');
     const filterBuilder = new FilterBuilder<PostDocument>().addMatchAll('tags', tags).addTextSearch(topic);
     const filter = filterBuilder.getFilter();
-    const query = this.postModel.find(filter).populate('author', { name: 1, _id: 1 }).select({ topic: 1, author: 1, tags: 1, created: 1 });
-    if (filter.$and?.filter((f) => f.$text).length) query.sort({ score: { $meta: 'textScore' } });
+    const query = this.postModel.aggregate<BulkPostResponse>().match(filter).lookup({
+      from: "users",
+      localField: "author",
+      foreignField: "_id",
+      as: "author",
+      pipeline: [{
+        $project: {
+          "_id":1,
+          "name":1
+        }
+      }]
+    })
+    const filterHasTextSearch = filter.$and?.filter((f) => f.$text).length > 0
+    if (filterHasTextSearch) query.sort({ score: { $meta: 'textScore' } });
     else query.sort({ [sortKey || 'created']: sortKey === 'created' ? -1 : 1 });
-    query.skip(page * 10).limit(10);
-    return await query;
+    const groupOption: any = {_id:null,posts: {$push: "$$ROOT"},count: {$sum:1}}
+    query.group(groupOption).project({
+      count: 1,
+      posts: {$slice: ["$posts",page*10,10]}
+    })
+    const res = await query
+    return res[0];
   }
   async findById(id: string) {
     const post = await this.postModel.findById(id).populate('author', { password: 0 });

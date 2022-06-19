@@ -1,5 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
-import { IsArray, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 import { Post } from '../entities/post.entity';
 import { Filter } from '../post.interface';
 
@@ -40,3 +40,9 @@ export class PostQuery {
 }
 
 export class PostResponse extends Post {}
+export class BulkPostResponse { 
+  @ApiProperty({type: [Post]})
+  posts: Post[]
+  @ApiProperty({type: Number,required:false})
+  count: number
+}
