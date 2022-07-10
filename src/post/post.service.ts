@@ -75,7 +75,7 @@ export class PostService {
     const post = await this.postModel.findById(id).populate('author');
     if (!post) throw new BadRequestException('This post does not exist');
     if (post.author._id.toString() !== authorId) throw new ForbiddenException("You don't have permission to modify this post.");
-    return await post.overwrite({ ...updatePostDto, author: post.author, created: new Date() });
+    return await post.updateOne({ ...updatePostDto, author: post.author, created: new Date() });
   }
 
   async remove(id: string, authorId: string) {
