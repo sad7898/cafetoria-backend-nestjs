@@ -9,6 +9,7 @@ import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { Profile } from './dto/get-user.dto';
 import { Role } from 'src/auth/jwt.constant';
+import { Post } from 'src/post/entities/post.entity';
 
 @Injectable()
 export class UserService {
@@ -30,7 +31,7 @@ export class UserService {
     }
     throw new UnauthorizedException('User ID or password is incorrect');
   }
-
+  //TODO : rename this to findByUsername
   async findOne(username: string) {
     const user = await this.userModel.findOne({ name: username });
     return user;
@@ -47,7 +48,15 @@ export class UserService {
       if (existingUser.email === dto.email) throw new BadRequestException('This email is already taken');
       else throw new BadRequestException('This username is already taken');
     }
-    const updatedUser = await user.overwrite({ ...dto, name: dto.username, password: user.password, posts: user.posts });
-    return updatedUser;
+    const immutableProps = ['password'];
+    Object.getOwnPropertyNames(dto).forEach((propertyName) => {
+      if (!immutableProps.includes(propertyName)) {
+        if (Array.isArray(user[propertyName])) {
+          const arr = user[propertyName] as Array<any>;
+          user[propertyName] = arr.concat(dto[propertyName]);
+        } else user[propertyName] = dto[propertyName];
+      }
+    });
+    return await user.save();
   }
 }
