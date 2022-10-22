@@ -22,6 +22,9 @@ export class Post {
   @ApiProperty({ type: [String] })
   @Prop()
   tags: string[];
+  @ApiProperty({ type: Number })
+  @Prop()
+  likeCount: number;
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
