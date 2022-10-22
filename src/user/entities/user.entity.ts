@@ -16,8 +16,10 @@ export class User {
   @Prop({ required: true })
   email: string;
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }], required: false })
-  posts: Post[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }], required: false, default: [] })
+  createdPosts: Post[];
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }], required: false, default: [] })
+  likedPosts: Post[];
 
   @Prop({ required: true })
   roles: Role[];

@@ -38,5 +38,5 @@ export class SignInResponse {
 }
 export class SignUpResponse {
   @ApiProperty({ type: Boolean })
-  success: boolean
+  success: boolean;
 }
