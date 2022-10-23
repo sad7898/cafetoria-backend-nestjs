@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/com
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from 'src/user/user.service';
-import { BulkPostResponse, CreatePostDto, PostFilterDto, UpdatePostDto } from './dto/post.dto';
+import { BulkPostResponse, CreatePostDto, IsLikedResponse, PostFilterDto, UpdatePostDto } from './dto/post.dto';
 import { Post, PostDocument } from './entities/post.entity';
 import { FilterBuilder } from './filter';
 
@@ -50,8 +50,13 @@ export class PostService {
     return res[0];
   }
   async findById(id: string) {
-    const post = await this.postModel.findById(id).populate('author', { password: 0 });
+    const post = await this.postModel.findById(id).populate('author', { password: 0, createdPosts: 0, likedPosts: 0 });
     return post;
+  }
+  async isPostLiked(id: string, userId: string): Promise<IsLikedResponse> {
+    const user = await this.userService.findById(userId);
+
+    return { isLiked: !!user?.likedPosts.find((postId) => postId.toString() === id) };
   }
   // async seed() {
   //   const author = await this.userService.findById('6287658491a854c35dcdc069');
@@ -83,9 +88,13 @@ export class PostService {
   async updateLikeCount(postId: string, likerId: string) {
     const post = await this.postModel.findById(postId);
     if (!post) throw new BadRequestException('This post does not exist');
-    this.userService.update({ likedPosts: [post] }, likerId);
-    post.likeCount += 1;
-    return await post.save();
+    const { isUnliked } = await this.userService.updateLikedPost(post, likerId);
+    if (isUnliked && post.likeCount > 0) post.likeCount -= 1;
+    else {
+      if (post.likeCount) post.likeCount += 1;
+      else post.likeCount = 1;
+    }
+    return { success: !!(await post.save()) };
   }
 
   async remove(id: string, authorId: string) {

@@ -22,7 +22,7 @@ export class Post {
   @ApiProperty({ type: [String] })
   @Prop()
   tags: string[];
-  @ApiProperty({ type: Number })
+  @ApiProperty({ type: Number, required: false, default: 0 })
   @Prop()
   likeCount: number;
 }
