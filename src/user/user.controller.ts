@@ -9,6 +9,7 @@ import { Role } from 'src/auth/jwt.constant';
 import { plainToInstance } from 'class-transformer';
 import { Profile } from './dto/get-user.dto';
 import { User } from './entities/user.entity';
+import { PostResponse } from 'src/post/dto/post.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -23,6 +24,20 @@ export class UserController {
     const user = await this.userService.findById(req.user.id);
     if (!user) throw new NotFoundException('User does not exist');
     return plainToInstance<Profile, User>(Profile, user, { excludeExtraneousValues: true });
+  }
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @ApiResponse({ type: [PostResponse] })
+  @Get('likedPosts')
+  async getLikedPosts(@Req() req) {
+    return this.userService.getLikedPosts(req.user.id);
+  }
+  @ApiBearerAuth()
+  @UseGuards(UserGuard)
+  @ApiResponse({ type: [PostResponse] })
+  @Get('createdPosts')
+  async getCreatedPosts(@Req() req) {
+    return this.userService.getCreatedPosts(req.user.id);
   }
   @Get(':username')
   @ApiResponse({ type: Profile })

@@ -38,11 +38,14 @@ export class PostQuery {
   @IsNumber()
   page: number;
 }
-
+export class IsLikedResponse {
+  @ApiProperty({ type: Boolean })
+  isLiked: boolean;
+}
 export class PostResponse extends Post {}
-export class BulkPostResponse { 
-  @ApiProperty({type: [Post]})
-  posts: Post[]
-  @ApiProperty({type: Number,required:false})
-  count: number
+export class BulkPostResponse {
+  @ApiProperty({ type: [Post] })
+  posts: Post[];
+  @ApiProperty({ type: Number, required: false })
+  count: number;
 }

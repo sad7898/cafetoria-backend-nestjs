@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto, SignInDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateLikedPostResult, UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { Profile } from './dto/get-user.dto';
 import { Role } from 'src/auth/jwt.constant';
-import { Post } from 'src/post/entities/post.entity';
+import { Post, PostDocument } from 'src/post/entities/post.entity';
+import { JwtPayload } from 'src/auth/auth.interface';
 
 @Injectable()
 export class UserService {
@@ -39,6 +40,29 @@ export class UserService {
   async findById(id: string) {
     const user = await this.userModel.findById(id, { password: 0 });
     return user;
+  }
+  async getLikedPosts(id: string) {
+    const user = await this.userModel.findById(id).select('likedPosts').populate('likedPosts');
+    if (!user) throw new NotFoundException('User does not exist');
+    return user.likedPosts;
+  }
+  async getCreatedPosts(id: string) {
+    const user = await this.userModel.findById(id).select('createdPosts').populate('createdPosts');
+    if (!user) throw new NotFoundException('User does not exist');
+    return user.createdPosts;
+  }
+  async updateLikedPost(post: PostDocument, userId: string): Promise<UpdateLikedPostResult> {
+    const user = await this.userModel.findById(userId);
+    if (!user) throw new NotFoundException('User does not exist');
+    const likedPostIndx = user.likedPosts.findIndex((likedPostId) => likedPostId.toString() === post._id.toString());
+    if (likedPostIndx === -1) {
+      user.likedPosts.push(post);
+      await user.save();
+      return { isUnliked: false };
+    }
+    user.likedPosts.splice(likedPostIndx, 1);
+    await user.save();
+    return { isUnliked: true };
   }
   async update(dto: UpdateUserDto, id: string) {
     const user = await this.userModel.findById(id);
